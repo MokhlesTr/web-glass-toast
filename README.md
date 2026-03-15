@@ -54,9 +54,7 @@ Use the `toast` API from buttons, forms, server actions, or async workflows.
 import { toast } from "@tarmiz/web-glass-toast";
 
 export function SaveButton() {
-  return (
-    <button onClick={() => toast.success("Project saved")}>Save</button>
-  );
+  return <button onClick={() => toast.success("Project saved")}>Save</button>;
 }
 ```
 
@@ -95,11 +93,14 @@ toast("File moved", {
 ## Step 5: Handle Async Operations With `toast.promise`
 
 ```ts
-await toast.promise(fetch("/api/project").then(r => r.json()), {
-  loading: "Saving project...",
-  success: "Project saved",
-  error: "Save failed",
-});
+await toast.promise(
+  fetch("/api/project").then(r => r.json()),
+  {
+    loading: "Saving project...",
+    success: "Project saved",
+    error: "Save failed",
+  },
+);
 ```
 
 You can also pass resolver functions for success/error messages.

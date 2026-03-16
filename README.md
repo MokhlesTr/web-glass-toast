@@ -1,5 +1,12 @@
 # @tarmiz/web-glass-toast
 
+[![npm version](https://img.shields.io/npm/v/@tarmiz/web-glass-toast.svg)](https://www.npmjs.com/package/@tarmiz/web-glass-toast)
+![npm weekly downloads](https://img.shields.io/npm/dw/@tarmiz/web-glass-toast)
+![License](https://img.shields.io/npm/l/@tarmiz/web-glass-toast)
+![npm types](https://img.shields.io/npm/types/@tarmiz/web-glass-toast)
+[![npm downloads](https://img.shields.io/npm/dm/@tarmiz/web-glass-toast.svg)](https://www.npmjs.com/package/@tarmiz/web-glass-toast)
+
+
 Modern glassmorphism toast notifications for React.
 
 [![Web Glass Toast Preview](https://image.thum.io/get/width/1400/https://web-glass-toast-documentation.vercel.app/)](https://web-glass-toast-documentation.vercel.app/)

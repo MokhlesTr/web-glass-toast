@@ -1,7 +1,7 @@
 {
   "name": "@tarmiz/web-glass-toast",
   "version": "1.1.0",
-  "description": "Modern glassmorphism toast notifications for React.",
+  "description": "Modern glassmorphism toast notifications for React, lightweight UI toast, and notification messages.",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -31,28 +31,31 @@
   "keywords": [
     "react",
     "toast",
+    "tarmiz",
+    "mokhles tarmiz",
     "notification",
     "glassmorphism",
-    "ui"
+    "ui",
+    "react-toast",
+    "toast-message",
+    "toast-notification",
+    "notification-component"
   ],
   "author": "Mokhles Tarmiz",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MokhlesTr/web-glass-toast.git"
+  },
+  "homepage": "https://github.com/MokhlesTr/web-glass-toast#readme",
+  "bugs": {
+    "url": "https://github.com/MokhlesTr/web-glass-toast/issues"
+  },
   "publishConfig": {
     "access": "public"
   },
   "peerDependencies": {
     "react": ">=18",
     "react-dom": ">=18"
-  },
-  "devDependencies": {
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^6.0.0",
-    "eslint": "^9.39.4",
-    "eslint-plugin-react-hooks": "^7.0.1",
-    "rimraf": "^6.1.0",
-    "typescript": "~5.9.3",
-    "typescript-eslint": "^8.56.1",
-    "vite": "^8.0.0"
   }
 }

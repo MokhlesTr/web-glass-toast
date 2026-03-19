@@ -14,6 +14,12 @@ interface ToastTheme {
   gradient: string;
 }
 
+type DragIntent = "pending" | "horizontal" | "vertical";
+
+const DRAG_DEADZONE = 8;
+const SWIPE_DISMISS_THRESHOLD = 120;
+const SWIPE_EXIT_DISTANCE = 220;
+
 const TOAST_THEME: Record<ToastType, ToastTheme> = {
   success: {
     accent: "#67f38a",
@@ -110,7 +116,9 @@ export function Toast({ toast, visualIndex, onDismiss }: ToastProps) {
   const progressRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLParagraphElement>(null);
   const dragStartRef = useRef(0);
+  const dragStartYRef = useRef(0);
   const draggingRef = useRef(false);
+  const dragIntentRef = useRef<DragIntent>("pending");
 
   const [dragX, setDragX] = useState(0);
   const [swipeExitX, setSwipeExitX] = useState(0);
@@ -190,8 +198,15 @@ export function Toast({ toast, visualIndex, onDismiss }: ToastProps) {
       return;
     }
 
+    if (event.pointerType === "mouse" && event.button !== 0) {
+      return;
+    }
+
     draggingRef.current = true;
     dragStartRef.current = event.clientX;
+    dragStartYRef.current = event.clientY;
+    dragIntentRef.current = "pending";
+    toastApi.pause(toast.id);
     event.currentTarget.setPointerCapture(event.pointerId);
   };
 
@@ -202,7 +217,24 @@ export function Toast({ toast, visualIndex, onDismiss }: ToastProps) {
       return;
     }
 
-    setDragX(event.clientX - dragStartRef.current);
+    const deltaX = event.clientX - dragStartRef.current;
+    const deltaY = event.clientY - dragStartYRef.current;
+    const absDeltaX = Math.abs(deltaX);
+    const absDeltaY = Math.abs(deltaY);
+
+    if (dragIntentRef.current === "pending") {
+      if (absDeltaX < DRAG_DEADZONE && absDeltaY < DRAG_DEADZONE) {
+        return;
+      }
+
+      dragIntentRef.current = absDeltaX > absDeltaY ? "horizontal" : "vertical";
+    }
+
+    if (dragIntentRef.current !== "horizontal") {
+      return;
+    }
+
+    setDragX(clamp(deltaX, -260, 260));
   };
 
   const handlePointerEnd: React.PointerEventHandler<HTMLDivElement> = event => {
@@ -211,15 +243,59 @@ export function Toast({ toast, visualIndex, onDismiss }: ToastProps) {
     }
 
     draggingRef.current = false;
-    event.currentTarget.releasePointerCapture(event.pointerId);
+    dragIntentRef.current = "pending";
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
 
-    if (Math.abs(dragX) > 90) {
-      setSwipeExitX(Math.sign(dragX) * 180);
+    if (Math.abs(dragX) > SWIPE_DISMISS_THRESHOLD) {
+      setSwipeExitX(Math.sign(dragX) * SWIPE_EXIT_DISTANCE);
+      setDragX(0);
       onDismiss();
       return;
     }
 
     setDragX(0);
+    setSwipeExitX(0);
+    toastApi.resume(toast.id);
+  };
+
+  const handlePointerCaptureLost: React.PointerEventHandler<
+    HTMLDivElement
+  > = () => {
+    if (!draggingRef.current) {
+      return;
+    }
+
+    draggingRef.current = false;
+    dragIntentRef.current = "pending";
+    setDragX(0);
+    setSwipeExitX(0);
+    toastApi.resume(toast.id);
+  };
+
+  const handleMouseEnter = () => {
+    if (!draggingRef.current) {
+      toastApi.pause(toast.id);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (!draggingRef.current) {
+      toastApi.resume(toast.id);
+    }
+  };
+
+  const handleFocus = () => {
+    if (!draggingRef.current) {
+      toastApi.pause(toast.id);
+    }
+  };
+
+  const handleBlur = () => {
+    if (!draggingRef.current) {
+      toastApi.resume(toast.id);
+    }
   };
 
   return (
@@ -232,14 +308,15 @@ export function Toast({ toast, visualIndex, onDismiss }: ToastProps) {
       data-single-line={isSingleLine}
       data-has-action={Boolean(toast.action)}
       data-with-icon={toast.withIcon}
-      onMouseEnter={() => toastApi.pause(toast.id)}
-      onMouseLeave={() => toastApi.resume(toast.id)}
-      onFocus={() => toastApi.pause(toast.id)}
-      onBlur={() => toastApi.resume(toast.id)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerEnd}
       onPointerCancel={handlePointerEnd}
+      onLostPointerCapture={handlePointerCaptureLost}
       role="status"
       aria-live="polite"
       style={
@@ -304,7 +381,9 @@ export function Toast({ toast, visualIndex, onDismiss }: ToastProps) {
                 }}
                 aria-label="Dismiss notification"
               >
-                <span aria-hidden="true">×</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M8 8l8 8M16 8l-8 8" />
+                </svg>
               </button>
             ) : null}
           </div>

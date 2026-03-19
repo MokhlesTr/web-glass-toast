@@ -56,18 +56,20 @@
   --drag-x: 0px;
   --swipe-exit-x: 0px;
   position: relative;
+  isolation: isolate;
   overflow: hidden;
   width: 100%;
   padding: 14px 18px;
   border-radius: 14px;
-  border: 1px solid var(--toast-surface-border);
-  background: var(--toast-surface-bg);
+  border: 1px solid var(--toast-surface-border, rgba(255, 255, 255, 0.2));
+  background: var(--toast-surface-bg, rgba(18, 23, 39, 0.52));
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  box-shadow: var(--toast-surface-shadow);
-  color: var(--toast-text-primary);
+  box-shadow: var(--toast-surface-shadow, 0 14px 34px rgba(0, 0, 0, 0.28));
+  color: var(--toast-text-primary, rgba(248, 250, 255, 0.96));
   touch-action: pan-y;
   user-select: none;
+  will-change: transform, opacity;
   transform-origin: center top;
   transform: translate3d(calc(var(--drag-x) + var(--swipe-exit-x)), 0, 0)
     scale(var(--stack-scale));
@@ -85,10 +87,10 @@
   background:
     linear-gradient(
       180deg,
-      var(--toast-highlight-top),
-      var(--toast-highlight-bottom)
+      var(--toast-highlight-top, rgba(255, 255, 255, 0.2)),
+      var(--toast-highlight-bottom, rgba(255, 255, 255, 0.02))
     ),
-    var(--toast-surface-overlay);
+    var(--toast-surface-overlay, transparent);
   opacity: 1;
   pointer-events: none;
 }
@@ -97,8 +99,8 @@
   background:
     linear-gradient(
       180deg,
-      var(--toast-gradient-highlight-top),
-      var(--toast-gradient-highlight-bottom)
+      var(--toast-gradient-highlight-top, rgba(255, 255, 255, 0.18)),
+      var(--toast-gradient-highlight-bottom, rgba(255, 255, 255, 0.03))
     ),
     var(--toast-gradient);
 }
@@ -122,8 +124,11 @@
 
 .toast-card:hover,
 .toast-card:focus-within {
-  border-color: var(--toast-surface-border-strong);
-  box-shadow: var(--toast-surface-shadow-hover);
+  border-color: var(--toast-surface-border-strong, rgba(255, 255, 255, 0.34));
+  box-shadow: var(
+    --toast-surface-shadow-hover,
+    0 18px 42px rgba(0, 0, 0, 0.34)
+  );
 }
 
 .toast-glow {
@@ -160,11 +165,13 @@
   width: 38px;
   height: 38px;
   border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.22);
   background:
     linear-gradient(
       180deg,
-      var(--toast-control-sheen-top),
-      var(--toast-control-sheen-bottom)
+      var(--toast-control-sheen-top, rgba(255, 255, 255, 0.18)),
+      var(--toast-control-sheen-bottom, rgba(255, 255, 255, 0.04))
     ),
     radial-gradient(
       circle at 22% 22%,
@@ -173,8 +180,13 @@
     ),
     color-mix(in srgb, var(--toast-accent) 14%, transparent);
   border: 1px solid
-    color-mix(in srgb, var(--toast-control-border) 72%, var(--toast-accent) 28%);
-  box-shadow: inset 0 1px 0 var(--toast-control-highlight);
+    color-mix(
+      in srgb,
+      var(--toast-control-border, rgba(255, 255, 255, 0.28)) 72%,
+      var(--toast-accent) 28%
+    );
+  box-shadow: inset 0 1px 0
+    var(--toast-control-highlight, rgba(255, 255, 255, 0.36));
   color: var(--toast-accent);
 }
 
@@ -233,8 +245,9 @@
   min-height: 30px;
   padding: 0 11px;
   border-radius: 999px;
-  background: var(--toast-control-bg);
-  box-shadow: inset 0 1px 0 var(--toast-control-highlight);
+  background: var(--toast-control-bg, rgba(255, 255, 255, 0.16));
+  box-shadow: inset 0 1px 0
+    var(--toast-control-highlight, rgba(255, 255, 255, 0.34));
   font: inherit;
   font-size: 0.78rem;
   font-weight: 600;
@@ -245,7 +258,7 @@
 
 .toast-action:hover,
 .toast-action:focus-visible {
-  background: var(--toast-control-bg-hover);
+  background: var(--toast-control-bg-hover, rgba(255, 255, 255, 0.24));
   transform: translateY(-1px);
 }
 
@@ -255,18 +268,27 @@
   justify-content: center;
   width: 30px;
   height: 30px;
+  padding: 0;
   border-radius: 50%;
-  background: var(--toast-control-bg);
-  font-size: 1.2rem;
-  line-height: 1;
+  background: var(--toast-control-bg, rgba(255, 255, 255, 0.16));
   transition:
     background 180ms ease,
     transform 180ms ease;
 }
 
+.toast-close svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .toast-close:hover,
 .toast-close:focus-visible {
-  background: var(--toast-control-bg-hover);
+  background: var(--toast-control-bg-hover, rgba(255, 255, 255, 0.24));
   transform: rotate(90deg);
 }
 
@@ -276,7 +298,7 @@
   margin-top: 12px;
   height: 3px;
   border-radius: 2px;
-  background: var(--toast-progress-track);
+  background: var(--toast-progress-track, rgba(255, 255, 255, 0.18));
   overflow: hidden;
 }
 
@@ -291,6 +313,15 @@
   );
   transform-origin: left center;
   box-shadow: 0 0 18px color-mix(in srgb, var(--toast-accent) 42%, transparent);
+}
+
+@supports not (
+  (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+) {
+  .toast-card {
+    background: var(--toast-surface-bg, rgba(18, 23, 39, 0.9));
+    border-color: var(--toast-surface-border, rgba(255, 255, 255, 0.18));
+  }
 }
 
 .toast-progress-bar.is-indeterminate {
